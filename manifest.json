@@ -1,0 +1,18 @@
+{
+	"manifest_version" : 2,
+	"background" : { "page": "bg.html" },
+	"browser_action" : {
+		"default_icon": "rally.png",
+		"default_title" : "Rally",
+		"default_popup" : "popup.html"
+	},
+	"description": "Tools to help you work more and spend less time in Rally.",
+	"icons": {
+		"128": "rally.png",
+		"48": "rally.png"
+	},
+	"name" : "Rally Extension",
+	"options_page": "options.html",
+	"permissions" : ["tabs"],
+	"version": "0.1"
+}
