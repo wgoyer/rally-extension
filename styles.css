@@ -1,0 +1,22 @@
+body {
+	border-radius: 5px;
+}
+.settings-container {
+	border-radius: 5px;
+	background-color: #EFEFEF;
+	height: 25em;
+	width: 75em;
+}
+.settings-input-fields {
+	position: absolute;
+	margin: 10px 0px 0px 10px;
+}
+input[type=text] {
+	width: 200px;
+}
+.subtext {
+	font-size: .8em; color: #999; display:block;
+}
+.save-button {
+	margin: 10px 0px 0px 0px
+}
