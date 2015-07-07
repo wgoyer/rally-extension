@@ -13,7 +13,12 @@
 	},
 	"name" : "Rally Extension",
 	"options_page": "options.html",
-	"permissions" : ["tabs", "webNavigation"],
-	"content_scripts" : ["./injection/recents.js"],
+	"permissions" : ["tabs", "activeTab", "webRequest", "<all_urls>"],
+	"content_scripts" : [{
+		"js" : ["./injection/recents.js"],
+		"matches": ["https://rally1.rallydev.com/*"],
+		// "run_at": "document_end"
+		"run_at": "document_start"
+	}],
 	"version": "0.1"
 }
