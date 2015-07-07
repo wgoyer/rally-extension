@@ -13,6 +13,7 @@
 	},
 	"name" : "Rally Extension",
 	"options_page": "options.html",
-	"permissions" : ["tabs"],
+	"permissions" : ["tabs", "webNavigation"],
+	"content_scripts" : ["./injection/recents.js"],
 	"version": "0.1"
 }
