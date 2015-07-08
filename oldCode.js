@@ -36,3 +36,42 @@
 			return recents.recentlyVisited.unshift(currentItem);
 		});
 	},5000);
+	
+	
+var startExtension = function(){
+	chrome.webRequest.onCompleted.addListener(function(req){
+		makeStupidRequest(req.url, function(res){
+			pullArtifactInfoAndStoreToRecents(JSON.parse(res).HierarchicalRequirement);
+		});
+	}, {
+		"urls": ["https://rally1.rallydev.com/slm/webservice/v2.x/HierarchicalRequirement?*"],
+		"types": ["xmlhttprequest"]
+		// "tabId": "",
+		// "windowId": "" 
+	});
+};
+
+var makeStupidRequest = function(reqUrl, callback){
+	var startIndex = reqUrl.indexOf('ObjectID%20%3D%20'),
+		endIndex = reqUrl.indexOf(')');
+	var oid = reqUrl.substring(startIndex+17, endIndex),
+	newUrl = "https://rally1.rallydev.com/slm/webservice/v2.x/HierarchicalRequirement/"+oid+"?fetch=FormattedID";
+	xmlRequest.open('GET',newUrl,true);
+	xmlRequest.send();
+	
+	xmlRequest.onreadystatechange = function(){
+		if(xmlRequest.readyState === 4){
+			callback(xmlRequest.responseText);
+		}
+	}
+}
+
+//requestTheArtifactDetails
+var startIndex = reqUrl.indexOf('ObjectID%20%3D%20'),
+		endIndex = reqUrl.indexOf(')');
+	var oid = reqUrl.substring(startIndex+17, endIndex),
+	newUrl = "https://rally1.rallydev.com/slm/webservice/v2.x/HierarchicalRequirement/"+oid+"?fetch=FormattedID";
+
+
+//createRegXs
+var artifacts = ["userstory/", "defectsuite/", "defect/", "task/", "iteration/", "release/", "portfolioitem/", "testcase/", "milestone/"],
