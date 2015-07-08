@@ -1,7 +1,14 @@
 /* global chrome */
 // Notes, bugs and the etceteras:
+
 // Need to ignore cases where users 404 but still match criteria.  If possible let's not make a request.
 // 		http://stackoverflow.com/questions/5341452/fetch-dns-error-and-error-404-with-a-chrome-extension
+
+// Let's refactor lines 16, 18 - 20 and see if we can pull info from tab instead of using changeInfo.url.
+
+// Get rid of auto-start functionality, we'll always auto-start unless the user uninstalls/disables the extension.
+
+// If possible, let's try and prevent any requests if a user already has the artifact in recents.  Instead let's just move it to the top of the pile.
 
 
 var settings = JSON.parse(localStorage["rally-ext"]),
