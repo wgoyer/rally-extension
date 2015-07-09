@@ -19,7 +19,6 @@ var initSettings = function(callback) {
 	if(!localStorage["rally-ext"]) localStorage["rally-ext"] = '{"domain" : "rally1.rallydev.com", "selectedArtifacts" : []}';
 	artifactInfo.getWatchArtifacts();
 	settings = JSON.parse(localStorage["rally-ext"]);
-	// recentsSettings = JSON.parse(localStorage["rally-ext-recents"]);
 	callback();
 };
 var startExtension = function(){
@@ -29,38 +28,50 @@ var startExtension = function(){
 		};
 	});
 };
-var requestTheArtifactDetails = function(url, callback){
-	var urlChunks = url.substring(8).split('/'),
-		artifactType = urlChunks[urlChunks.length-2],
-		artifactOid = urlChunks[urlChunks.length-1],
-		//Let's pull fetchParams from settings when we have it configured.
-		fetchParams = ["FormattedID", "Name"],
-		newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/"+artifactInfo[artifactType].objName+"/"+artifactOid+"?fetch=";
-		for (var i=0; i<fetchParams.length; i++){
-			newUrl += fetchParams[i] + ",";
-		}
-	
-	xmlRequest.open('GET',newUrl,true);
+var sendRequest = function(url, callback){
+	xmlRequest.open('GET', url, true);
 	xmlRequest.send();
-	
+
 	xmlRequest.onreadystatechange = function(){
 		if(xmlRequest.readyState === 4){
-			callback(artifactType, xmlRequest.responseText);
+			callback(xmlRequest.responseText);
 		}
 	}
+}
+var requestTheArtifactDetails = function(url, callback){
+	var urlChunks = url.substring(8).split('/'),
+		newUrl = "",
+		artifactType = urlChunks[urlChunks.length-2],
+		artifactOid = urlChunks[urlChunks.length-1];
+		for (var i=0; i < settings.selectedArtifacts.length; i++){
+			if (artifactType === settings.selectedArtifacts[i]){
+				newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/"+artifactInfo[artifactType].objName+"/"+artifactOid+"?fetch=FormattedID, Name";
+				break;
+			}
+		}
+		if(newUrl === "") return;
+		sendRequest(newUrl, function(res){
+			callback(artifactType, res);
+		});	
 };
 var checkURLforArtifactInfo = function(tab){
+	var matchFound = false;
 	createRegXs(function(regeXs){
 		for(var i=0;i<regeXs.length;i++){
 			if(regeXs[i].test(tab.url)) {
-				// Fix this function being declared inside loop.
-				return requestTheArtifactDetails(tab.url, function(artifactType, xhrResponse){
-					var res = JSON.parse(xhrResponse),
-						firstParam = artifactInfo[artifactType].objName;
-					pullArtifactInfoAndStoreToRecents(res[firstParam], tab.url);
-				});
-			} 
-		}	
+				matchFound = true;
+				break;
+			}
+		}
+		if(matchFound){
+			return requestTheArtifactDetails(tab.url, function(artifactType, xhrResponse){
+				var res = JSON.parse(xhrResponse),
+					firstParam = artifactInfo[artifactType].objName;
+				pullArtifactInfoAndStoreToRecents(res[firstParam], tab.url);
+			});
+		} else {
+			return;
+		};
 	});
 };
 var createRegXs = function(callback){
@@ -85,6 +96,10 @@ var pullArtifactInfoAndStoreToRecents = function(artifact, url){
 	} 
 	recents.recentlyVisited.unshift(currentItem);
 	return localStorage['rally-ext-recents'] = JSON.stringify(recents);	
+};
+
+var updateSettings = function(){
+	
 };
 
 initSettings(startExtension);
