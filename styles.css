@@ -26,17 +26,12 @@ html.popup {
 }
 body.popup {
 	height: 580px; font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-    font-size: 100%;
-}
-.status {
-    white-space: pre;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    max-width: 400px;
+    font-size: 12px;
+ 	background-color: lightgrey;
 }
 .truncate {
   	white-space: nowrap; 
-    width: 12em; 
+    width: 31em; 
     overflow: hidden;
     text-overflow: ellipsis;
 }

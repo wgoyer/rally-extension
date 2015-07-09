@@ -5,6 +5,9 @@ var addEventListeners = function(){
 };
 var loadMostRecentsAndAppend = function(){
 	var recents = JSON.parse(localStorage["rally-ext-recents"]);
+	if(recents.recentlyVisited.length > 0){
+		document.getElementById("recently-visited").innerHTML = "<h3>Your recently visited Items</h3>";
+	}
 	for(var i = 0;i<recents.recentlyVisited.length;i++){
 		buildHTMLForRecents(recents.recentlyVisited[i]);
 	}
