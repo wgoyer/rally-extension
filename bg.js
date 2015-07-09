@@ -2,6 +2,8 @@
 // Notes, bugs and the etceteras:
 
 // Need to ignore cases where users 404 but still match criteria.  If possible let's not make a request.
+// 		Review errors from WSAPI and don't push to local storage if they exist as well.  May need to 
+//		handle unauthorized access as well
 // 		http://stackoverflow.com/questions/5341452/fetch-dns-error-and-error-404-with-a-chrome-extension
 
 // Let's refactor lines 16, 18 - 20 and see if we can pull info from tab instead of using changeInfo.url.
@@ -10,15 +12,21 @@
 
 // If possible, let's try and prevent any requests if a user already has the artifact in recents.  Instead let's just move it to the top of the pile.
 
+// Change fetch to formattedID
 
-var settings = JSON.parse(localStorage["rally-ext"]),
+
+var settings,
 	xmlRequest=new XMLHttpRequest();
-var checkAutoStartAndRun = function(){
-	if(JSON.parse(localStorage['rally-ext']).autoStartValue) return startExtension();
+	
+var initSettings = function(callback) {
+	if(!localStorage["rally-ext-recents"]) localStorage["rally-ext-recents"] = '{"recentlyVisited" : []}';
+	if(!localStorage["rally-ext"]) localStorage["rally-ext"] = '{"domain" : "rally1.rallydev.com"}';
+	artifactInfo.getWatchArtifacts();
+	settings = JSON.parse(localStorage["rally-ext"]);
+	// recentsSettings = JSON.parse(localStorage["rally-ext-recents"]);
+	callback();
 };
 var startExtension = function(){
-	artifactInfo.getWatchArtifacts();
-	if(!localStorage["rally-ext-recents"]) localStorage["rally-ext-recents"] = '{"recentlyVisited" : []}';
 	var changeUrl = "";
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tabState){
 		if(changeInfo.status === "loading" && changeInfo.url) changeUrl = changeInfo.url;
@@ -34,7 +42,12 @@ var requestTheArtifactDetails = function(url, callback){
 	var urlChunks = url.substring(8).split('/'),
 		artifactType = urlChunks[urlChunks.length-2],
 		artifactOid = urlChunks[urlChunks.length-1],
-		newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/"+artifactInfo[artifactType].objName+"/"+artifactOid;
+		//Let's pull fetchParams from settings when we have it configured.
+		fetchParams = ["FormattedID", "Name"],
+		newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/"+artifactInfo[artifactType].objName+"/"+artifactOid+"?fetch=";
+		for (var i=0; i<fetchParams.length; i++){
+			newUrl += fetchParams[i] + ",";
+		}
 	
 	xmlRequest.open('GET',newUrl,true);
 	xmlRequest.send();
@@ -82,4 +95,4 @@ var pullArtifactInfoAndStoreToRecents = function(artifact, url){
 	return localStorage['rally-ext-recents'] = JSON.stringify(recents);	
 };
 
-checkAutoStartAndRun();
+initSettings(startExtension);
