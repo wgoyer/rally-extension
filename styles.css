@@ -4,8 +4,8 @@ body {
 .settings-container {
 	border-radius: 5px;
 	background-color: #EFEFEF;
-	height: 25em;
-	width: 75em;
+	height: 28em;
+	width: 36em;
 }
 .settings-input-fields {
 	position: absolute;
@@ -34,4 +34,25 @@ body.popup {
     width: 31em; 
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.options.rightside {
+	position: relative;
+	float: right;
+	margin-right: 15px;
+	text-align: left;
+}
+.options.leftside {
+	position: relative;
+	float: left;
+	margin-left: 15px;
+}
+.options.artifact-title {
+	margin-right: 20px;
+	margin-left: 20px;
+}
+.artifact-selections {
+	position: absolute;
+	border: black solid 1px;
+	border-radius: 5px;
+	width: 250px;
 }

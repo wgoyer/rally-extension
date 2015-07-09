@@ -6,10 +6,6 @@
 //		handle unauthorized access as well
 // 		http://stackoverflow.com/questions/5341452/fetch-dns-error-and-error-404-with-a-chrome-extension
 
-// Let's refactor lines 16, 18 - 20 and see if we can pull info from tab instead of using changeInfo.url.
-
-// Get rid of auto-start functionality, we'll always auto-start unless the user uninstalls/disables the extension.
-
 // If possible, let's try and prevent any requests if a user already has the artifact in recents.  Instead let's just move it to the top of the pile.
 
 // Change fetch to formattedID
@@ -20,22 +16,17 @@ var settings,
 	
 var initSettings = function(callback) {
 	if(!localStorage["rally-ext-recents"]) localStorage["rally-ext-recents"] = '{"recentlyVisited" : []}';
-	if(!localStorage["rally-ext"]) localStorage["rally-ext"] = '{"domain" : "rally1.rallydev.com"}';
+	if(!localStorage["rally-ext"]) localStorage["rally-ext"] = '{"domain" : "rally1.rallydev.com", "selectedArtifacts" : []}';
 	artifactInfo.getWatchArtifacts();
 	settings = JSON.parse(localStorage["rally-ext"]);
 	// recentsSettings = JSON.parse(localStorage["rally-ext-recents"]);
 	callback();
 };
 var startExtension = function(){
-	var changeUrl = "";
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tabState){
-		if(changeInfo.status === "loading" && changeInfo.url) changeUrl = changeInfo.url;
-		if(changeInfo.status === "complete" && changeUrl !== ""){
-			if(changeUrl.substring(8, settings.domain.length+8) === settings.domain){
-				changeUrl = "";
-				return checkURLforArtifactInfo(tabState);
-			};
-		}	
+		if(tabState.url.substring(8, settings.domain.length+8) === settings.domain){
+			return checkURLforArtifactInfo(tabState);
+		};
 	});
 };
 var requestTheArtifactDetails = function(url, callback){
@@ -62,6 +53,7 @@ var checkURLforArtifactInfo = function(tab){
 	createRegXs(function(regeXs){
 		for(var i=0;i<regeXs.length;i++){
 			if(regeXs[i].test(tab.url)) {
+				// Fix this function being declared inside loop.
 				return requestTheArtifactDetails(tab.url, function(artifactType, xhrResponse){
 					var res = JSON.parse(xhrResponse),
 						firstParam = artifactInfo[artifactType].objName;
