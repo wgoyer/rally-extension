@@ -10,6 +10,7 @@
 
 // Change fetch to formattedID
 
+// Grabbing the data for iframes: document.getElementsByTagName("iframe")[0].contentDocument.body.innerHTML = "What?!"
 
 var settings,
 	xmlRequest=new XMLHttpRequest();
