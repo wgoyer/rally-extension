@@ -11,7 +11,7 @@ var addEventListeners = function(){
 			localStorage["rally-ext-templates"] = result[0];
 		});
 	});
-	// Look at changing replace regex to propery escape all the characters in the localStorage template.
+	// Look at replacing regex to properly escape all the characters in the localStorage template.
 	document.getElementById("restore-template").addEventListener("click", function(){
 		var myElement = "document.getElementsByTagName('iframe')[0].contentDocument.body.innerHTML = '"
 		var template = JSON.stringify(localStorage['rally-ext-templates']).addSlashes();
@@ -32,10 +32,20 @@ var addEventListeners = function(){
 				};
 			}
 			var theIndex = tab.title.indexOf("| Rally");
-			tab.title = tab.title.substring(0, theIndex-1);
-			currentBookMarks.push({"title":tab.title, "url":tab.url});
-			localStorage["rally-ext-bookmarks"] = JSON.stringify(currentBookMarks);
-		});
+			if(theIndex != "-1"){
+				tab.title = tab.title.substring(0, theIndex-1);
+				currentBookMarks.push({"title":tab.title, "url":tab.url});
+				localStorage["rally-ext-bookmarks"] = JSON.stringify(currentBookMarks);	
+			}
+		});	
+	});
+	document.getElementById("restore-bookmarks").addEventListener("click", function(){
+		var savedRallyBookMarks = JSON.parse(localStorage["rally-ext-bookmarks"]),
+			urlArray = [];
+			for(var i=0;i<savedRallyBookMarks.length;i++){
+				urlArray.push(savedRallyBookMarks[i].url);
+			}
+		chrome.windows.create({url: urlArray});
 	});
 };
 var loadMostRecentsAndAppend = function(){
