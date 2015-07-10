@@ -20,6 +20,23 @@ var addEventListeners = function(){
 			template = template + "'";
 		chrome.tabs.executeScript(null, {code: myElement+template});
 	});
+	document.getElementById("save-bookmark").addEventListener("click", function(){
+		if(!localStorage["rally-ext-bookmarks"]) localStorage["rally-ext-bookmarks"] = "[]";
+		var currentBookMarks = JSON.parse(localStorage["rally-ext-bookmarks"]),
+			tab;
+		chrome.windows.getCurrent({"populate": true}, function(window){
+			for(var i=0;i<window.tabs.length;i++){
+				if(window.tabs[i].active) {
+					tab = window.tabs[i];
+					break;
+				};
+			}
+			var theIndex = tab.title.indexOf("| Rally");
+			tab.title = tab.title.substring(0, theIndex-1);
+			currentBookMarks.push({"title":tab.title, "url":tab.url});
+			localStorage["rally-ext-bookmarks"] = JSON.stringify(currentBookMarks);
+		});
+	});
 };
 var loadMostRecentsAndAppend = function(){
 	var recents = JSON.parse(localStorage["rally-ext-recents"]);
