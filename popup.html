@@ -3,17 +3,27 @@
   <head>
     <title>Rally</title>
     <link rel="stylesheet" type="text/css" href="styles.css" />
-    <script src="popup.js"></script>
+	<link rel="stylesheet" type="text/css" href="./lib/jquery/jquery-ui.min.css" />
+	<script src="./lib/jquery/jquery-2.1.4.min.js"></script>
+	<script src="./lib/jquery/jquery-ui.min.js"></script>
+	<script src="./popup.js"></script>
   </head>
   <body class="popup">
-    <div id="recently-visited"></div>
-	<div id="templating">
-		<button id ="get-template">Save as Template</button>
-		<button id ="restore-template">Restore Template</button>
-	</div>
-	<div id="bookmarks">
-		<button id ="save-bookmark">Save to my Rally Pages</button>
-		<button id ="restore-bookmarks">Open Rally bookmarks in new window</button>
-	</div>
+	  <div id="accordion">
+	  	<h3> Recents </h3>
+		<div id="recently-visited"></div>
+		<h3> Templates </h3>
+		<div id="templating">
+			<div id="template-append"></div>
+			<div id="template-info"></div>
+			<button id ="get-template">Get Template</button>
+			<button id ="save-template">Save as Template</button>
+			<button id ="restore-template">Restore Template</button>
+		</div>
+		<h3> Bookmarks </h3>
+		<div id="bookmarks">
+			<button id ="save-bookmark">Save to my Rally Pages</button>
+			<button id ="restore-bookmarks">Open Rally bookmarks in new window</button>
+		</div>
   </body>
 </html>

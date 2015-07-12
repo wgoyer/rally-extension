@@ -22,11 +22,13 @@ input[type=text] {
 }
 
 html.popup { 
-	width:400px; height:400px; 
+	width:400px; 
+	min-height:100px; 
 }
 body.popup {
-	height: 580px; font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
-    font-size: 12px;
+	min-height: 100px; 
+	font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
+    font-size: 10px;
  	background-color: lightgrey;
 }
 .truncate {
@@ -56,3 +58,10 @@ body.popup {
 	border-radius: 5px;
 	width: 250px;
 }
+p.truncate {
+	border-bottom: 1px dotted;
+	padding-bottom: 5px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
