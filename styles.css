@@ -64,4 +64,17 @@ p.truncate {
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
-
+.popup.enabled {
+	border: 1px solid #4C3C1B;
+	border-radius: 5px;
+	padding: 5px;
+	margin-bottom: 10px;
+}
+.strong {
+	font-weight: bolder;
+}
+.popup.link {
+	cursor:pointer;
+	color:blue;
+	text-decoration:underline;
+}

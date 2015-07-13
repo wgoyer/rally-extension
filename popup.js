@@ -18,14 +18,24 @@ var addEventListeners = function(){
 			}
 		});
 	});
-	loadMostRecentsAndAppend();	
+	loadMostRecentsAndAppend();
+	loadTemplatesAndAppend();
+	loadBookMarksAndAppend();
+	$(".template-header").on("click", "a", function(){
+		loadTemplate($(this).text());
+	});
 	document.getElementById("save-template").addEventListener("click", function(){
+		if(!localStorage["rally-ext-templates"]) localStorage["rally-ext-templates"] = "[]";
 		chrome.tabs.executeScript(null, {code: 'document.getElementsByTagName("iframe")[0].contentDocument.body.innerHTML;'}, function(result){
-			localStorage["rally-ext-templates"] = result[0];
-			document.getElementById("template-append").innerHTML = result[0];
+			getSettingsFromLocalStorage("rally-ext-templates", function(currentTemplates){
+				currentTemplates.push({"name": $("#template-name").val(), "tags": $("#template-tags").val().split(","), "template" : result[0]});
+				saveValuesToLocalStorage("rally-ext-templates", currentTemplates);
+				document.getElementById("template-append").innerHTML = result[0];	
+			});
 		});
 	});
 	document.getElementById("get-template").addEventListener("click", function(){
+		$("#template-append").addClass("enabled");
 		var nameTextBox = "<label>Name: </label><input type='text' id='template-name'></input><span class='subtext'>Name your template</span>";
 		var nameTags = "<label>Tags: </label><input type='text' id='template-tags'></input><span class='subtext'>Add tags, use commas to separate</span>";
 		chrome.tabs.executeScript(null, {code: 'document.getElementsByTagName("iframe")[0].contentDocument.body.innerHTML;'}, function(result){
@@ -35,12 +45,16 @@ var addEventListeners = function(){
 	});
 	// Look at replacing regex to properly escape all the characters in the localStorage template.
 	document.getElementById("restore-template").addEventListener("click", function(){
-		var myElement = "document.getElementsByTagName('iframe')[0].contentDocument.body.innerHTML = '"
-		var template = JSON.stringify(localStorage['rally-ext-templates']).addSlashes();
+		getSettingsFromLocalStorage("rally-ext-templates", function(currentTemplates){
+			var myElement = "document.getElementsByTagName('iframe')[0].contentDocument.body.innerHTML = '"
+			var template = $("#template-append").html(); 
+			template = JSON.stringify(template).addSlashes();
 			template = template.slice(1);
 			template = template.slice(0,-1);
 			template = template + "'";
-		chrome.tabs.executeScript(null, {code: myElement+template});
+		chrome.tabs.executeScript(null, {code: myElement+template});	
+		});
+		
 	});
 	document.getElementById("save-bookmark").addEventListener("click", function(){
 		if(!localStorage["rally-ext-bookmarks"]) localStorage["rally-ext-bookmarks"] = "[]";
@@ -57,12 +71,10 @@ var addEventListeners = function(){
 				if(theIndex != "-1"){
 					tab.title = tab.title.substring(0, theIndex-1);
 					currentBookMarks.push({"title":tab.title, "url":tab.url});
-					saveValuesToLocalStorage("rally-ext-bookmarks", currentBookMarks);
-					// localStorage["rally-ext-bookmarks"] = JSON.stringify(currentBookMarks);	
+					saveValuesToLocalStorage("rally-ext-bookmarks", currentBookMarks);	
 				}
 			});	
 		});
-		// var currentBookMarks = JSON.parse(localStorage["rally-ext-bookmarks"]),
 	});
 	document.getElementById("restore-bookmarks").addEventListener("click", function(){
 		getSettingsFromLocalStorage("rally-ext-bookmarks", function(savedRallyBookMarks){
@@ -74,6 +86,16 @@ var addEventListeners = function(){
 		});
 	});
 };
+var loadTemplate = function(templateName){
+	getSettingsFromLocalStorage("rally-ext-templates", function(currentTemplates){
+		for(var i = 0;i<currentTemplates.length;i++){
+			if(currentTemplates[i].name === templateName){
+				$("#template-append").addClass("enabled");
+				return document.getElementById("template-append").innerHTML = currentTemplates[i].template;
+			}
+		}
+	});
+};
 var saveActiveAccordion = function(settings){
 	settings.activeAccordion = $("#accordion").accordion("option", "active");
 	saveValuesToLocalStorage('rally-ext', settings);
@@ -83,9 +105,34 @@ var loadMostRecentsAndAppend = function(){
 		document.getElementById("recently-visited").innerHTML = "<h3>Your recently visited Items</h3>";
 		if(recents.recentlyVisited.length == 0){
 			document.getElementById("recently-visited").innerHTML += "<p>Items will be displayed here after you start visiting the detail pages of items in your artifacts type list found on the options page of the extension.</p>";
+		} else {
+			for(var i = 0;i<recents.recentlyVisited.length;i++){
+				buildHTMLForRecents(recents.recentlyVisited[i]);
+			}	
 		}
-		for(var i = 0;i<recents.recentlyVisited.length;i++){
-			buildHTMLForRecents(recents.recentlyVisited[i]);
+	});
+};
+var loadTemplatesAndAppend = function(){
+	getSettingsFromLocalStorage('rally-ext-templates', function(templates){
+		$(".template-header").html("<h3>Your saved templates</h3>");
+		if(templates.length == 0){
+			$(".template-header").append("A list of your templates will be displayed here once you've saved your first one.");
+		} else {
+			for(var i=0;i<templates.length;i++){
+				buildHTMLForTemplates(templates[i]);
+			}	
+		}
+	});
+};
+var loadBookMarksAndAppend = function(){
+	getSettingsFromLocalStorage('rally-ext-bookmarks', function(bookmarks){
+		$("#bookmark-append").html("<h3>Your saved Rally bookmarks</h3>");
+		if(bookmarks.length == 0){
+			$("#bookmark-append").append("A list of your Rally saved bookmarks will be displayed here once you've saved a bookmark.");
+		} else {
+			for(var i=0;i<bookmarks.length;i++){
+				$("#bookmark-append").append("<p class='truncate'><a target='_blank' href='"+bookmarks[i].url+"'>"+bookmarks[i].title+"</a></p>");
+			}
 		}
 	});
 };
@@ -94,6 +141,10 @@ var buildHTMLForRecents = function(item){
 		injectableHTML = "<p class=truncate><a target='_blank' href='"+item.URL+"'>"+item.FormattedID+"</a>: "+item.Title+"</p>";
 	appendableElement.innerHTML += injectableHTML;
 };
+var buildHTMLForTemplates = function(item){
+	var itemId = item.name.replace(/\s+/g, '-');
+	$(".template-header").append("<p class = 'truncate'><label class='strong'>Name: </label><a href = '#' id ='"+itemId+"'>"+item.name+"</a><label class='strong'> Tags: </label>"+item.tags+"</p>");
+}
 var getSettingsFromLocalStorage = function(settingType, callback){
 	var settings = JSON.parse(localStorage[settingType]);
 	callback(settings);	
