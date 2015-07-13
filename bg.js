@@ -10,6 +10,8 @@
 
 // Change fetch to formattedID
 
+// Add special handling for portfolio items, iterations, releases
+
 // Grabbing the data for iframes: document.getElementsByTagName("iframe")[0].contentDocument.body.innerHTML = "What?!"
 
 var settings,
