@@ -8,18 +8,13 @@
 
 // If possible, let's try and prevent any requests if a user already has the artifact in recents.  Instead let's just move it to the top of the pile.
 
-// Change fetch to formattedID
-
-// Add special handling for portfolio items, iterations, releases
-
-// Grabbing the data for iframes: document.getElementsByTagName("iframe")[0].contentDocument.body.innerHTML = "What?!"
-
 var settings,
 	xmlRequest=new XMLHttpRequest();
 	
 var initSettings = function(callback) {
-	if(!localStorage["rally-ext-recents"]) localStorage["rally-ext-recents"] = '{"recentlyVisited" : []}';
 	if(!localStorage["rally-ext"]) localStorage["rally-ext"] = '{"domain" : "rally1.rallydev.com", "selectedArtifacts" : []}';
+	if(!localStorage["rally-ext-recents"]) localStorage["rally-ext-recents"] = '{"recentlyVisited" : []}';
+	if(!localStorage["rally-ext-templates"]) localStorage["rally-ext-templates"] = '{"active" : "", "templates" : []}';
 	artifactInfo.getWatchArtifacts();
 	settings = JSON.parse(localStorage["rally-ext"]);
 	callback();
@@ -40,8 +35,9 @@ var sendRequest = function(url, callback){
 			callback(xmlRequest.responseText);
 		}
 	}
-}
+};
 var requestTheArtifactDetails = function(url, callback){
+	// This should only be called if artifact in the URL matches the watchedList
 	var urlChunks = url.substring(8).split('/'),
 		newUrl = "",
 		artifactType,
@@ -56,14 +52,13 @@ var requestTheArtifactDetails = function(url, callback){
 			artifactOid = urlChunks[5];
 			newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/"+artifactInfo[artifactType].objName+"/"+artifactOid+"?fetch="+artifactInfo[artifactType].fetch;
 		}				
-		for (var i=0; i < settings.selectedArtifacts.length; i++){	
-			if(artifactType === settings.selectedArtifacts[i]){
+		//for (var i=0; i < settings.selectedArtifacts.length; i++){	
+		//	if(artifactType === settings.selectedArtifacts[i]){
 				return sendRequest(newUrl, function(res){
 					callback(artifactType, res);
-				});		
-			}
-		}
-		return;	
+		//		});		
+		//	}
+		});
 };
 var checkURLforArtifactInfo = function(tab){
 	var matchFound = false;

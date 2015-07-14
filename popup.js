@@ -25,7 +25,6 @@ var addEventListeners = function(){
 		loadTemplate($(this).text());
 	});
 	document.getElementById("save-template").addEventListener("click", function(){
-		if(!localStorage["rally-ext-templates"]) localStorage["rally-ext-templates"] = "[]";
 		chrome.tabs.executeScript(null, {code: 'document.getElementsByTagName("iframe")[0].contentDocument.body.innerHTML;'}, function(result){
 			getSettingsFromLocalStorage("rally-ext-templates", function(currentTemplates){
 				currentTemplates.push({"name": $("#template-name").val(), "tags": $("#template-tags").val().split(","), "template" : result[0]});
