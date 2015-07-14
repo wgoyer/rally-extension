@@ -77,7 +77,7 @@ var checkURLforArtifactInfo = function(tab){
 		if(matchFound){
 			return requestTheArtifactDetails(tab.url, function(artifactType, xhrResponse){
 				var res = JSON.parse(xhrResponse),
-					firstParam = res[Object.keys(res)[0]]
+					firstParam = res[Object.keys(res)[0]];
 				pullArtifactInfoAndStoreToRecents(firstParam, tab.url);
 			});
 		} else {
