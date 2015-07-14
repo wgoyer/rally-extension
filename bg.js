@@ -44,18 +44,26 @@ var sendRequest = function(url, callback){
 var requestTheArtifactDetails = function(url, callback){
 	var urlChunks = url.substring(8).split('/'),
 		newUrl = "",
-		artifactType = urlChunks[urlChunks.length-2],
-		artifactOid = urlChunks[urlChunks.length-1];
-		for (var i=0; i < settings.selectedArtifacts.length; i++){
-			if (artifactType === settings.selectedArtifacts[i]){
-				newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/"+artifactInfo[artifactType].objName+"/"+artifactOid+"?fetch=FormattedID, Name";
-				break;
+		artifactType,
+		artifactOid;
+
+		if(urlChunks[4] === "portfolioitem") {
+			artifactType = urlChunks[4];
+			artifactOid = urlChunks[6];
+			newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/portfolioitem/"+urlChunks[5]+"/"+artifactOid+"?fetch="+artifactInfo.portfolioitem.fetch;
+		} else {
+			artifactType = urlChunks[4];
+			artifactOid = urlChunks[5];
+			newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/"+artifactInfo[artifactType].objName+"/"+artifactOid+"?fetch="+artifactInfo[artifactType].fetch;
+		}				
+		for (var i=0; i < settings.selectedArtifacts.length; i++){	
+			if(artifactType === settings.selectedArtifacts[i]){
+				return sendRequest(newUrl, function(res){
+					callback(artifactType, res);
+				});		
 			}
 		}
-		if(newUrl === "") return;
-		sendRequest(newUrl, function(res){
-			callback(artifactType, res);
-		});	
+		return;	
 };
 var checkURLforArtifactInfo = function(tab){
 	var matchFound = false;
@@ -69,8 +77,8 @@ var checkURLforArtifactInfo = function(tab){
 		if(matchFound){
 			return requestTheArtifactDetails(tab.url, function(artifactType, xhrResponse){
 				var res = JSON.parse(xhrResponse),
-					firstParam = artifactInfo[artifactType].objName;
-				pullArtifactInfoAndStoreToRecents(res[firstParam], tab.url);
+					firstParam = res[Object.keys(res)[0]]
+				pullArtifactInfoAndStoreToRecents(firstParam, tab.url);
 			});
 		} else {
 			return;
@@ -88,8 +96,16 @@ var createRegXs = function(callback){
 var pullArtifactInfoAndStoreToRecents = function(artifact, url){
 	var recentStorage = JSON.parse(localStorage['rally-ext-recents']),
 		recents = {recentlyVisited : recentStorage.recentlyVisited || []},
-		currentItem = {"FormattedID" : artifact.FormattedID, "Title" : artifact._refObjectName, "URL" : url};
-		
+		currentItem = {};		
+	if(artifact.FormattedID) {
+		currentItem = {"FormattedID" : artifact.FormattedID, "Title" : artifact._refObjectName, "URL" : url};	
+	} 
+	if(artifact.StartDate){
+		currentItem = {"FormattedID" : "Iteration", "Title" : artifact.Name, "URL" : url};	
+	}
+	if(artifact.ReleaseStartDate){
+		currentItem = {"FormattedID" : "Release", "Title" : artifact.Name, "URL" : url};
+	}		
 	if(recentStorage.recentlyVisited.length>0){
 		for(var i=0;i<recentStorage.recentlyVisited.length;i++){
 			if(recentStorage.recentlyVisited[i].FormattedID === currentItem.FormattedID){
