@@ -33,7 +33,7 @@ var addEventListeners = function(){
 	document.getElementById("save-template").addEventListener("click", function(){
 		chrome.tabs.executeScript(null, {code: 'document.getElementsByTagName("iframe")[0].contentDocument.body.innerHTML;'}, function(result){
 			getSettingsFromLocalStorage("rally-ext-templates", function(currentTemplates){
-				currentTemplates.push({"name": $("#template-name").val(), "tags": $("#template-tags").val().split(","), "template" : result[0]});
+				currentTemplates.templates.push({"name": $("#template-name").val(), "tags": $("#template-tags").val().split(","), "template" : result[0]});
 				saveValuesToLocalStorage("rally-ext-templates", currentTemplates);
 				document.getElementById("template-append").innerHTML = result[0];	
 			});
@@ -50,16 +50,13 @@ var addEventListeners = function(){
 	});
 	// Look at replacing regex to properly escape all the characters in the localStorage template.
 	document.getElementById("restore-template").addEventListener("click", function(){
-		getSettingsFromLocalStorage("rally-ext-templates", function(currentTemplates){
-			var myElement = "document.getElementsByTagName('iframe')[0].contentDocument.body.innerHTML = '"
-			var template = $("#template-append").html(); 
-			template = JSON.stringify(template).addSlashes();
-			template = template.slice(1);
-			template = template.slice(0,-1);
-			template = template + "'";
-		chrome.tabs.executeScript(null, {code: myElement+template});	
-		});
-		
+		var myElement = "document.getElementsByTagName('iframe')[0].contentDocument.body.innerHTML = '"
+		var template = $("#template-append").html(); 
+		template = JSON.stringify(template).addSlashes();
+		template = template.slice(1);
+		template = template.slice(0,-1);
+		template = template + "'";
+		chrome.tabs.executeScript(null, {code: myElement+template});			
 	});
 	document.getElementById("save-bookmark").addEventListener("click", function(){
 		if(!localStorage["rally-ext-bookmarks"]) localStorage["rally-ext-bookmarks"] = "[]";
@@ -111,10 +108,10 @@ var loadAutoCompleteValues = function(){
 
 var loadTemplate = function(templateName){
 	getSettingsFromLocalStorage("rally-ext-templates", function(currentTemplates){
-		for(var i = 0;i<currentTemplates.length;i++){
-			if(currentTemplates[i].name === templateName){
+		for(var i = 0;i<currentTemplates.templates.length;i++){
+			if(currentTemplates.templates[i].name === templateName){
 				$("#template-append").addClass("enabled");
-				return document.getElementById("template-append").innerHTML = currentTemplates[i].template;
+				return document.getElementById("template-append").innerHTML = currentTemplates.templates[i].template;
 			}
 		}
 	});
@@ -136,13 +133,13 @@ var loadMostRecentsAndAppend = function(){
 	});
 };
 var loadTemplatesAndAppend = function(){
-	getSettingsFromLocalStorage('rally-ext-templates', function(templates){
+	getSettingsFromLocalStorage('rally-ext-templates', function(currentTemplates){
 		// $(".template-header").html("<h3>Your saved templates</h3>");
-		if(templates.length == 0){
+		if(currentTemplates.templates.length == 0){
 			$(".template-header").append("A list of your templates will be displayed here once you've saved your first one.");
 		} else {
-			for(var i=0;i<templates.length;i++){
-				buildHTMLForTemplates(templates[i]);
+			for(var i=0;i<currentTemplates.templates.length;i++){
+				buildHTMLForTemplates(currentTemplates.templates[i]);
 			}	
 		}
 	});
@@ -166,7 +163,7 @@ var buildHTMLForRecents = function(item){
 };
 var buildHTMLForTemplates = function(item){
 	var itemId = item.name.replace(/\s+/g, '-');
-	$(".template-append").append("<p class = 'truncate'><label class='strong'>Name: </label><a href = '#' id ='"+itemId+"'>"+item.name+"</a><label class='strong'> Tags: </label>"+item.tags+"</p>");
+	$("#template-append").append("<p class = 'truncate'><label class='strong'>Name: </label><a href = '#' id ='"+itemId+"'>"+item.name+"</a><label class='strong'> Tags: </label>"+item.tags+"</p>");
 }
 var getSettingsFromLocalStorage = function(settingType, callback){
 	var settings = JSON.parse(localStorage[settingType]);
