@@ -18,6 +18,12 @@ var addEventListeners = function(){
 			}
 		});
 	});
+	$("#autocomplete").autocomplete({
+		select: function(event, ui) {
+			console.log('hi');
+		},
+	});
+	loadAutoCompleteValues();
 	loadMostRecentsAndAppend();
 	loadTemplatesAndAppend();
 	loadBookMarksAndAppend();
@@ -85,6 +91,24 @@ var addEventListeners = function(){
 		});
 	});
 };
+var loadAutoCompleteValues = function(){
+	getSettingsFromLocalStorage("rally-ext-templates", function(templateSettings){
+		var allTagsFromAllTemplates = [],
+			filteredTags = [];
+		for(var i=0;i<templateSettings.templates.length;i++){
+			if(templateSettings.templates[i].tags.length > 0){
+				for(var y=0;y<templateSettings.templates[i].tags.length;y++){
+					if(templateSettings.templates[i].tags[y] != ""){
+						allTagsFromAllTemplates.push(templateSettings.templates[i].tags[y].trim());	
+					}
+				}
+			}	
+		}
+		filteredTags = allTagsFromAllTemplates.filter(function(item, i, ar){return ar.indexOf(item) === i;});
+		$("#autocomplete").autocomplete("option", "source", filteredTags);			
+	});
+};
+
 var loadTemplate = function(templateName){
 	getSettingsFromLocalStorage("rally-ext-templates", function(currentTemplates){
 		for(var i = 0;i<currentTemplates.length;i++){
@@ -101,7 +125,7 @@ var saveActiveAccordion = function(settings){
 };
 var loadMostRecentsAndAppend = function(){
 	getSettingsFromLocalStorage('rally-ext-recents', function(recents){
-		document.getElementById("recently-visited").innerHTML = "<h3>Your recently visited Items</h3>";
+		// document.getElementById("recently-visited").innerHTML = "<h3>Your recently visited Items</h3>";
 		if(recents.recentlyVisited.length == 0){
 			document.getElementById("recently-visited").innerHTML += "<p>Items will be displayed here after you start visiting the detail pages of items in your artifacts type list found on the options page of the extension.</p>";
 		} else {
@@ -113,7 +137,7 @@ var loadMostRecentsAndAppend = function(){
 };
 var loadTemplatesAndAppend = function(){
 	getSettingsFromLocalStorage('rally-ext-templates', function(templates){
-		$(".template-header").html("<h3>Your saved templates</h3>");
+		// $(".template-header").html("<h3>Your saved templates</h3>");
 		if(templates.length == 0){
 			$(".template-header").append("A list of your templates will be displayed here once you've saved your first one.");
 		} else {
@@ -125,7 +149,7 @@ var loadTemplatesAndAppend = function(){
 };
 var loadBookMarksAndAppend = function(){
 	getSettingsFromLocalStorage('rally-ext-bookmarks', function(bookmarks){
-		$("#bookmark-append").html("<h3>Your saved Rally bookmarks</h3>");
+		// $("#bookmark-append").html("<h3>Your saved Rally bookmarks</h3>");
 		if(bookmarks.length == 0){
 			$("#bookmark-append").append("A list of your Rally saved bookmarks will be displayed here once you've saved a bookmark.");
 		} else {
@@ -142,7 +166,7 @@ var buildHTMLForRecents = function(item){
 };
 var buildHTMLForTemplates = function(item){
 	var itemId = item.name.replace(/\s+/g, '-');
-	$(".template-header").append("<p class = 'truncate'><label class='strong'>Name: </label><a href = '#' id ='"+itemId+"'>"+item.name+"</a><label class='strong'> Tags: </label>"+item.tags+"</p>");
+	$(".template-append").append("<p class = 'truncate'><label class='strong'>Name: </label><a href = '#' id ='"+itemId+"'>"+item.name+"</a><label class='strong'> Tags: </label>"+item.tags+"</p>");
 }
 var getSettingsFromLocalStorage = function(settingType, callback){
 	var settings = JSON.parse(localStorage[settingType]);

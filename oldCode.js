@@ -75,3 +75,6 @@ var startIndex = reqUrl.indexOf('ObjectID%20%3D%20'),
 
 //createRegXs
 var artifacts = ["userstory/", "defectsuite/", "defect/", "task/", "iteration/", "release/", "portfolioitem/", "testcase/", "milestone/"],
+
+var a = ["1", "1", "2", "3", "3", "1"];
+var unique = a.filter(function(item, i, ar){ return ar.indexOf(item) === i; });

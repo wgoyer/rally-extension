@@ -8,9 +8,13 @@
 
 // If possible, let's try and prevent any requests if a user already has the artifact in recents.  Instead let's just move it to the top of the pile.
 
-var settings,
-	xmlRequest=new XMLHttpRequest();
-	
+// Make templates searchable by tag drop or search
+// Group bookmarks and allow users to open all tabs in a group
+// Add checkboxes to recents to allow users to keep them on top.
+
+
+var settings;
+
 var initSettings = function(callback) {
 	if(!localStorage["rally-ext"]) localStorage["rally-ext"] = '{"domain" : "rally1.rallydev.com", "selectedArtifacts" : []}';
 	if(!localStorage["rally-ext-recents"]) localStorage["rally-ext-recents"] = '{"recentlyVisited" : []}';
@@ -21,12 +25,13 @@ var initSettings = function(callback) {
 };
 var startExtension = function(){
 	chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tabState){
-		if(tabState.url.substring(8, settings.domain.length+8) === settings.domain){
+		if(tabState.url.substring(8, settings.domain.length+8) === settings.domain && changeInfo.url){
 			return checkURLforArtifactInfo(tabState);
 		};
 	});
 };
 var sendRequest = function(url, callback){
+	var xmlRequest=new XMLHttpRequest();
 	xmlRequest.open('GET', url, true);
 	xmlRequest.send();
 

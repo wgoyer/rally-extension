@@ -78,3 +78,7 @@ p.truncate {
 	color:blue;
 	text-decoration:underline;
 }
+.popup.search {
+	margin-bottom: 10px;
+	font-weight: bold;
+}
