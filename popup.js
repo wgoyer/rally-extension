@@ -18,22 +18,25 @@ var addEventListeners = function(){
 			}
 		});
 	});
-	$("#autocomplete").autocomplete({
-		select: function(event, ui) {
-			console.log('hi');
-		},
-	});
-	loadAutoCompleteValues();
 	loadMostRecentsAndAppend();
 	loadTemplatesAndAppend();
 	loadBookMarksAndAppend();
-	$(".template-header").on("click", "a", function(){
+	$("#template-append").on("click", "a", function(){
 		loadTemplate($(this).text());
+	});
+	$("#template-append").on("click", "button", function(){
+		$("#template-append").html("");
+		loadTemplatesAndAppend();
+		$(this).remove();
 	});
 	document.getElementById("save-template").addEventListener("click", function(){
 		chrome.tabs.executeScript(null, {code: 'document.getElementsByTagName("iframe")[0].contentDocument.body.innerHTML;'}, function(result){
+			var formattedTags = $("#template-tags").val().split(",");
+			for(var i=0;i<formattedTags.length;i++) {
+				formattedTags[i] = formattedTags[i].trim();
+			}
 			getSettingsFromLocalStorage("rally-ext-templates", function(currentTemplates){
-				currentTemplates.templates.push({"name": $("#template-name").val(), "tags": $("#template-tags").val().split(","), "template" : result[0]});
+				currentTemplates.templates.push({"name": $("#template-name").val(), "tags": formattedTags, "template" : result[0]});
 				saveValuesToLocalStorage("rally-ext-templates", currentTemplates);
 				document.getElementById("template-append").innerHTML = result[0];	
 			});
@@ -120,9 +123,18 @@ var saveActiveAccordion = function(settings){
 	settings.activeAccordion = $("#accordion").accordion("option", "active");
 	saveValuesToLocalStorage('rally-ext', settings);
 };
+var filterTemplatesOnTag = function(tag){
+	getSettingsFromLocalStorage("rally-ext-templates", function(currentTemplates){
+		$("#template-append").html("<button>Clear Filter</button>");
+		for(var i=0;i<currentTemplates.templates.length;i++){
+			if(currentTemplates.templates[i].tags.indexOf(tag) > -1) {
+				buildHTMLForTemplates(currentTemplates.templates[i]);
+			}
+		}
+	});
+};
 var loadMostRecentsAndAppend = function(){
 	getSettingsFromLocalStorage('rally-ext-recents', function(recents){
-		// document.getElementById("recently-visited").innerHTML = "<h3>Your recently visited Items</h3>";
 		if(recents.recentlyVisited.length == 0){
 			document.getElementById("recently-visited").innerHTML += "<p>Items will be displayed here after you start visiting the detail pages of items in your artifacts type list found on the options page of the extension.</p>";
 		} else {
@@ -134,10 +146,18 @@ var loadMostRecentsAndAppend = function(){
 };
 var loadTemplatesAndAppend = function(){
 	getSettingsFromLocalStorage('rally-ext-templates', function(currentTemplates){
-		// $(".template-header").html("<h3>Your saved templates</h3>");
 		if(currentTemplates.templates.length == 0){
-			$(".template-header").append("A list of your templates will be displayed here once you've saved your first one.");
+			$(".template-header").html("A list of your templates will be displayed here once you've saved your first one.");
 		} else {
+			$("#search").html("<label for'autocomplete'>Search by Tag: </label><input id ='autocomplete'><hr>");
+			$("#autocomplete").autocomplete({
+				select: function(event, ui) {
+					filterTemplatesOnTag(ui.item.value);
+				},
+				create: function(){
+					loadAutoCompleteValues();
+				}
+			});
 			for(var i=0;i<currentTemplates.templates.length;i++){
 				buildHTMLForTemplates(currentTemplates.templates[i]);
 			}	
@@ -146,7 +166,6 @@ var loadTemplatesAndAppend = function(){
 };
 var loadBookMarksAndAppend = function(){
 	getSettingsFromLocalStorage('rally-ext-bookmarks', function(bookmarks){
-		// $("#bookmark-append").html("<h3>Your saved Rally bookmarks</h3>");
 		if(bookmarks.length == 0){
 			$("#bookmark-append").append("A list of your Rally saved bookmarks will be displayed here once you've saved a bookmark.");
 		} else {
@@ -163,7 +182,15 @@ var buildHTMLForRecents = function(item){
 };
 var buildHTMLForTemplates = function(item){
 	var itemId = item.name.replace(/\s+/g, '-');
-	$("#template-append").append("<p class = 'truncate'><label class='strong'>Name: </label><a href = '#' id ='"+itemId+"'>"+item.name+"</a><label class='strong'> Tags: </label>"+item.tags+"</p>");
+	var formattedTags = "";
+	for(var i=0;i<item.tags.length;i++) {
+		if(i<item.tags.length-1){
+			formattedTags += item.tags[i] + ", "	
+		} else {
+			formattedTags += item.tags[i];
+		}
+	} 
+	$("#template-append").append("<p class = 'truncate'><label class='strong'>Name: </label><a href = '#' id ='"+itemId+"'>"+item.name+"</a><label class='strong'> Tags: </label>"+formattedTags+"</p>");
 }
 var getSettingsFromLocalStorage = function(settingType, callback){
 	var settings = JSON.parse(localStorage[settingType]);
