@@ -82,3 +82,6 @@ p.truncate {
 	margin-bottom: 10px;
 	font-weight: bold;
 }
+.hidden {
+	display: none;
+}

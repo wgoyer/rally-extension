@@ -58,12 +58,8 @@ var requestTheArtifactDetails = function(url, callback){
 			artifactOid = urlChunks[5];
 			newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/"+artifactInfo[artifactType].objName+"/"+artifactOid+"?fetch="+artifactInfo[artifactType].fetch;
 		}				
-		//for (var i=0; i < settings.selectedArtifacts.length; i++){	
-		//	if(artifactType === settings.selectedArtifacts[i]){
-				return sendRequest(newUrl, function(res){
-					callback(artifactType, res);
-		//		});		
-		//	}
+		return sendRequest(newUrl, function(res){
+			callback(artifactType, res);
 		});
 };
 var checkURLforArtifactInfo = function(tab){
@@ -116,10 +112,6 @@ var pullArtifactInfoAndStoreToRecents = function(artifact, url){
 	} 
 	recents.recentlyVisited.unshift(currentItem);
 	return localStorage['rally-ext-recents'] = JSON.stringify(recents);	
-};
-
-var updateSettings = function(){
-	
 };
 
 initSettings(startExtension);
