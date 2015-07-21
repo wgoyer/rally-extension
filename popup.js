@@ -21,15 +21,15 @@ var addEventListeners = function(){
 	loadMostRecentsAndAppend();
 	loadTemplatesAndAppend();
 	loadBookMarksAndAppend();
-	$("#template-append").on("click", "a", function(){
+	$("#template-append").on("click", "a", function(){ //*
 		loadTemplate($(this).text());
 	});
-	$("#template-append").on("click", "button", function(){
+	$("#template-append").on("click", "button", function(){ //*
 		$("#template-append").html("");
 		loadTemplatesAndAppend();
 		$(this).remove();
 	});
-	document.getElementById("save-template").addEventListener("click", function(){
+	document.getElementById("save-template").addEventListener("click", function(){ //*
 		chrome.tabs.executeScript(null, {code: 'document.getElementsByTagName("iframe")[0].contentDocument.body.innerHTML;'}, function(result){
 			var formattedTags = $("#template-tags").val().split(",");
 			for(var i=0;i<formattedTags.length;i++) {
@@ -42,7 +42,7 @@ var addEventListeners = function(){
 			});
 		});
 	});
-	document.getElementById("get-template").addEventListener("click", function(){
+	document.getElementById("get-template").addEventListener("click", function(){ //*
 		$("#template-append").addClass("enabled");
 		var nameTextBox = "<label>Name: </label><input type='text' id='template-name'></input><span class='subtext'>Name your template</span>";
 		var nameTags = "<label>Tags: </label><input type='text' id='template-tags'></input><span class='subtext'>Add tags, use commas to separate</span>";
@@ -52,7 +52,7 @@ var addEventListeners = function(){
 		});
 	});
 	// Look at replacing regex to properly escape all the characters in the localStorage template.
-	document.getElementById("restore-template").addEventListener("click", function(){
+	document.getElementById("restore-template").addEventListener("click", function(){ //*
 		var myElement = "document.getElementsByTagName('iframe')[0].contentDocument.body.innerHTML = '"
 		var template = $("#template-append").html(); 
 		template = JSON.stringify(template).addSlashes();
@@ -61,7 +61,7 @@ var addEventListeners = function(){
 		template = template + "'";
 		chrome.tabs.executeScript(null, {code: myElement+template});			
 	});
-	document.getElementById("save-bookmark").addEventListener("click", function(){
+	document.getElementById("save-bookmark").addEventListener("click", function(){ //*
 		if(!localStorage["rally-ext-bookmarks"]) localStorage["rally-ext-bookmarks"] = "[]";
 		getSettingsFromLocalStorage("rally-ext-bookmarks", function(currentBookMarks){
 			var tab;
@@ -81,7 +81,7 @@ var addEventListeners = function(){
 			});	
 		});
 	});
-	document.getElementById("restore-bookmarks").addEventListener("click", function(){
+	document.getElementById("restore-bookmarks").addEventListener("click", function(){ //*
 		getSettingsFromLocalStorage("rally-ext-bookmarks", function(savedRallyBookMarks){
 			var urlArray = [];
 			for(var i=0;i<savedRallyBookMarks.length;i++){
@@ -133,7 +133,7 @@ var filterTemplatesOnTag = function(tag){
 		}
 	});
 };
-var loadMostRecentsAndAppend = function(){
+var loadMostRecentsAndAppend = function(){ //*
 	getSettingsFromLocalStorage('rally-ext-recents', function(recents){
 		if(recents.recentlyVisited.length == 0){
 			document.getElementById("recently-visited").innerHTML += "<p>Items will be displayed here after you start visiting the detail pages of items in your artifacts type list found on the options page of the extension.</p>";
@@ -144,7 +144,7 @@ var loadMostRecentsAndAppend = function(){
 		}
 	});
 };
-var loadTemplatesAndAppend = function(){
+var loadTemplatesAndAppend = function(){ //*
 	getSettingsFromLocalStorage('rally-ext-templates', function(currentTemplates){
 		if(currentTemplates.templates.length == 0){
 			$(".template-header").html("A list of your templates will be displayed here once you've saved your first one.");
@@ -164,7 +164,7 @@ var loadTemplatesAndAppend = function(){
 		}
 	});
 };
-var loadBookMarksAndAppend = function(){
+var loadBookMarksAndAppend = function(){ //*
 	getSettingsFromLocalStorage('rally-ext-bookmarks', function(bookmarks){
 		if(bookmarks.length == 0){
 			$("#bookmark-append").append("A list of your Rally saved bookmarks will be displayed here once you've saved a bookmark.");
@@ -175,7 +175,7 @@ var loadBookMarksAndAppend = function(){
 		}
 	});
 };
-var buildHTMLForRecents = function(item){
+var buildHTMLForRecents = function(item){ //*
 	var appendableElement = document.getElementById("recently-visited"),
 		injectableHTML = "<p class=truncate><a target='_blank' href='"+item.URL+"'>"+item.FormattedID+"</a>: "+item.Title+"</p>";
 	appendableElement.innerHTML += injectableHTML;
