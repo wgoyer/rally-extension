@@ -1,4 +1,4 @@
-var recents = new Recents(localStorage["rally-ext-recents"]);
+var recents = new Recents(JSON.parse(localStorage["rally-ext-recents"]));
 
 var inputFieldElements = {
 	saveButton : document.getElementById("save-button"),
@@ -38,7 +38,7 @@ var restoreOptions = function(){
 };
 
 var loadRecentsToPage = function(){
-	recents.loadMostRecentsAndAppend("recents-append");
+	recents.loadMostRecentsAndAppend("#recents-append");
 };
 
 document.addEventListener('DOMContentLoaded', addEventListeners);
