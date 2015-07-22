@@ -1,9 +1,12 @@
+var recents = new Recents(localStorage["rally-ext-recents"]);
+
 var inputFieldElements = {
 	saveButton : document.getElementById("save-button"),
 	domainValue : document.getElementById("domain"),
 };
 
 var addEventListeners = function(){
+	loadRecentsToPage();
 	restoreOptions();
 	inputFieldElements.saveButton.addEventListener('click', saveSettings);
 };
@@ -32,6 +35,10 @@ var restoreOptions = function(){
 			document.querySelector("input[value="+appSettings.selectedArtifacts[i]+"]").checked = true;
 		}
 	}
+};
+
+var loadRecentsToPage = function(){
+	recents.loadMostRecentsAndAppend("recents-append");
 };
 
 document.addEventListener('DOMContentLoaded', addEventListeners);

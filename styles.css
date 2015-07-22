@@ -52,6 +52,14 @@ body.popup {
 	margin-right: 20px;
 	margin-left: 20px;
 }
+.options.recents-settings {
+	border: 1px solid #4C3C1B;
+	border-radius: 5px;
+	padding: 5px;
+	margin-bottom: 10px;
+	height: 400px;
+	width: 400px;
+}
 .artifact-selections {
 	position: absolute;
 	border: black solid 1px;
