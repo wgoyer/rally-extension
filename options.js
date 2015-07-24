@@ -39,6 +39,14 @@ var restoreOptions = function(){
 
 var loadRecentsToPage = function(){
 	recents.loadMostRecentsAndAppend("#recents-append");
+	var allRecents = $(".truncate"),
+		theHtmlz;
+		
+	for(var i=0;i<allRecents.length;i++){
+		theHtmlz = "<input id='recents-"+i+"' type='checkbox'>";
+		$($(allRecents)[i]).prepend(theHtmlz);
+	}
 };
+
 
 document.addEventListener('DOMContentLoaded', addEventListeners);
