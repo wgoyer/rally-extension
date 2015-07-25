@@ -91,3 +91,7 @@ p.truncate {
 .hidden {
 	display: none;
 }
+.icon {
+	height: 15px;
+	width: 15px;
+}

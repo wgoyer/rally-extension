@@ -43,7 +43,7 @@ var loadRecentsToPage = function(){
 		theHtmlz;
 		
 	for(var i=0;i<allRecents.length;i++){
-		theHtmlz = "<input id='recents-"+i+"' type='checkbox'>";
+		theHtmlz = "<input id='recents-"+i+"' type='checkbox'> <a href='#' id='delete-"+i+"'><img class='icon' src='trash.png'></a>";
 		$($(allRecents)[i]).prepend(theHtmlz);
 	}
 };
