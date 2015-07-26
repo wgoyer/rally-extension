@@ -18,7 +18,7 @@ var settings;
 
 var initSettings = function(callback) {
 	if(!localStorage["rally-ext"]) localStorage["rally-ext"] = '{"domain" : "rally1.rallydev.com", "selectedArtifacts" : []}';
-	if(!localStorage["rally-ext-recents"]) localStorage["rally-ext-recents"] = '{"recentlyVisited" : []}';
+	if(!localStorage["rally-ext-recents"]) localStorage["rally-ext-recents"] = '{"recentlyVisited" : [], groupTogether : false, recentAmount : 15}';
 	if(!localStorage["rally-ext-templates"]) localStorage["rally-ext-templates"] = '{"active" : "", "templates" : []}';
 	artifactInfo.getWatchArtifacts();
 	settings = JSON.parse(localStorage["rally-ext"]);
@@ -47,19 +47,22 @@ var requestTheArtifactDetails = function(url, callback){
 	var urlChunks = url.substring(8).split('/'),
 		newUrl = "",
 		artifactType,
+		artifactName,
 		artifactOid;
 
 		if(urlChunks[4] === "portfolioitem") {
 			artifactType = urlChunks[4];
 			artifactOid = urlChunks[6];
 			newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/portfolioitem/"+urlChunks[5]+"/"+artifactOid+"?fetch="+artifactInfo.portfolioitem.fetch;
+			artifactName = artifactInfo[artifactType].name;
 		} else {
 			artifactType = urlChunks[4];
 			artifactOid = urlChunks[5];
 			newUrl = "https://"+settings.domain+"/slm/webservice/v2.x/"+artifactInfo[artifactType].objName+"/"+artifactOid+"?fetch="+artifactInfo[artifactType].fetch;
+			artifactName = artifactInfo[artifactType].name;
 		}				
 		return sendRequest(newUrl, function(res){
-			callback(artifactType, res);
+			callback(artifactType, artifactName, res);
 		});
 };
 var checkURLforArtifactInfo = function(tab){
@@ -72,10 +75,10 @@ var checkURLforArtifactInfo = function(tab){
 			}
 		}
 		if(matchFound){
-			return requestTheArtifactDetails(tab.url, function(artifactType, xhrResponse){
+			return requestTheArtifactDetails(tab.url, function(artifactType, artifactName, xhrResponse){
 				var res = JSON.parse(xhrResponse),
 					firstParam = res[Object.keys(res)[0]];
-				pullArtifactInfoAndStoreToRecents(firstParam, tab.url);
+				pullArtifactInfoAndStoreToRecents(firstParam, artifactName, tab.url);
 			});
 		} else {
 			return;
@@ -90,18 +93,18 @@ var createRegXs = function(callback){
 	};
 	return callback(allMyRegXsLiveInTexas);
 };
-var pullArtifactInfoAndStoreToRecents = function(artifact, url){
+var pullArtifactInfoAndStoreToRecents = function(artifact, artifactName, url){
 	var recentStorage = JSON.parse(localStorage['rally-ext-recents']),
 		recents = {recentlyVisited : recentStorage.recentlyVisited || []},
 		currentItem = {};		
 	if(artifact.FormattedID) {
-		currentItem = {"FormattedID" : artifact.FormattedID, "Title" : artifact._refObjectName, "URL" : url};	
+		currentItem = {"FormattedID" : artifact.FormattedID, "Title" : artifact._refObjectName, "URL" : url, artifactType : artifactName};	
 	} 
 	if(artifact.StartDate){
-		currentItem = {"FormattedID" : "Iteration", "Title" : artifact.Name, "URL" : url};	
+		currentItem = {"FormattedID" : "Iteration", "Title" : artifact.Name, "URL" : url, artifactType : artifactName};	
 	}
 	if(artifact.ReleaseStartDate){
-		currentItem = {"FormattedID" : "Release", "Title" : artifact.Name, "URL" : url};
+		currentItem = {"FormattedID" : "Release", "Title" : artifact.Name, "URL" : url, artifactType : artifactName};
 	}		
 	if(recentStorage.recentlyVisited.length>0){
 		for(var i=0;i<recentStorage.recentlyVisited.length;i++){
