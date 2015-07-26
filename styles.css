@@ -95,3 +95,6 @@ p.truncate {
 	height: 15px;
 	width: 15px;
 }
+.mark-for-delete{
+	text-decoration: line-through;
+}

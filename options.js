@@ -1,4 +1,6 @@
-var recents = new Recents(JSON.parse(localStorage["rally-ext-recents"]));
+var recents = new Recents(JSON.parse(localStorage["rally-ext-recents"])),
+	recentsToDelete = [];
+
 
 var inputFieldElements = {
 	saveButton : document.getElementById("save-button"),
@@ -8,6 +10,18 @@ var inputFieldElements = {
 var addEventListeners = function(){
 	loadRecentsToPage();
 	restoreOptions();
+	$(".trash-icon").on("click", function(e){
+		e.preventDefault();
+		if ($(this).parent().hasClass("mark-for-delete")) {
+			$(this).parent().removeClass("mark-for-delete");
+			recentsToDelete.splice(recentsToDelete.indexOf($(this).attr("id")), 1);
+		}
+		else { 
+			$(this).addClass("mark-for-delete");
+			$(this).parent().addClass("mark-for-delete");
+			recentsToDelete.push($(this).attr("id"));
+		}
+	});
 	inputFieldElements.saveButton.addEventListener('click', saveSettings);
 };
 var saveSettings = function(){
@@ -43,7 +57,7 @@ var loadRecentsToPage = function(){
 		theHtmlz;
 		
 	for(var i=0;i<allRecents.length;i++){
-		theHtmlz = "<input id='recents-"+i+"' type='checkbox'> <a href='#' id='delete-"+i+"'><img class='icon' src='trash.png'></a>";
+		theHtmlz = "<input id='recents-"+i+"' type='checkbox'> <a href='#' class='trash-icon' id='delete-"+i+"'><img class='icon' src='trash.png'></a>";
 		$($(allRecents)[i]).prepend(theHtmlz);
 	}
 };
