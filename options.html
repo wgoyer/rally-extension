@@ -3,9 +3,11 @@
 		<title>Rally Chrome Extension - Settings</title>
 		<link rel="stylesheet" type="text/css" href="styles.css" />
 		<link rel="stylesheet" type="text/css" href="./lib/jquery/jquery-ui.min.css" />
+		<link rel="stylesheet" href="lib/font-awesome/css/font-awesome.min.css" />
 		<script src="./lib/jquery/jquery-2.1.4.min.js"></script>
 		<script src="./lib/jquery/jquery-ui.min.js"></script>
 		<script src="./lib/recents.js"></script>
+		<script src="./lib/bookmarks.js"></script>
 	</head>
 	<body>
 		<div id = "title">
@@ -32,13 +34,19 @@
 				</div>
 			</div>
 		</div>
-		<div class="options recents-settings">
+		<div class="options settings">
 			<strong>Settings for Recents</strong>
 			<p><label>Group by Type: </label><input id="recents-group" type="checkbox"><span class="subtext">Check this box if you want to group your recents by artifact type.</span></p>
 			<p><label># of Recents: </label><input id="recents-count" type='number' min='5' max='30'><span class="subtext">Indicates the amount of recents to show when you click the Rally icon.</span></p>
 			<div id="recents-append" class="options recents-append"></div>
+			<button id="clear-all-recents">Remove all Recents</button><span id="span-clear-all-recents"></span>
 		</div>
-		<button id="save-button" class="save-button">Save Settings</button>
+		<div class="options settings">
+			<strong>Settings for Bookmarks</strong>
+			<div id="bookmarks-append" class="options bookmarks-append"></div>
+			<button id="clear-all-bookmarks">Remove all Bookmarks</button><span class="subtext">Will only remove the bookmarks listed here.  All other bookmarks are safe.</span>
+		</div>
+		<button id="save-button" class="save-button">Save Settings</button><span id="save-span"></span>
 	</body>
 	<script src='options.js'></script>
 </html>

@@ -52,7 +52,7 @@ body.popup {
 	margin-right: 20px;
 	margin-left: 20px;
 }
-.options.recents-settings {
+.options.settings {
 	border: 1px solid #4C3C1B;
 	border-radius: 5px;
 	padding: 5px;
@@ -95,6 +95,25 @@ p.truncate {
 	height: 15px;
 	width: 15px;
 }
-.mark-for-delete{
+/*.mark-for-delete{
 	text-decoration: line-through;
+}*/
+.trash-icon {
+	font-size: 16px;
+	text-decoration: none;
+	color: darkgrey;
+	padding-right: 5px;
+	border-right: 1px dotted black;
+	margin-right: 5px;
+}
+.mark-for-delete {
+	color: red;
+}
+.pin-icon {
+	font-size: 16px;
+	color: darkgrey;
+	margin-right: 5px;
+}
+.pin-icon-selected {
+	color: green;
 }

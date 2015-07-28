@@ -1,5 +1,3 @@
-/// <reference path="typings/jquery/jquery.d.ts"/>
-/* global chrome */
 var templates = new Templates(JSON.parse(localStorage["rally-ext-templates"]));
 var bookmarks = new Bookmarks(JSON.parse(localStorage["rally-ext-bookmarks"]));
 var recents = new Recents(JSON.parse(localStorage["rally-ext-recents"]));
