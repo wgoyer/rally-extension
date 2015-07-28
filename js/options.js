@@ -1,3 +1,11 @@
+// fa-refresh for iteration icon
+// fa-rocket for release
+// fa-bug for defects
+// fa-folder for portfolio
+// fa-book for user story
+// fa-flask for test case
+// 
+
 /// <reference path="typings/jquery/jquery.d.ts"/>
 var recents = new Recents(JSON.parse(localStorage["rally-ext-recents"])),
 	bookmarks = new Bookmarks(JSON.parse(localStorage["rally-ext-bookmarks"])),
