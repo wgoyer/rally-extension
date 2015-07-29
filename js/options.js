@@ -6,21 +6,18 @@
 // fa-flask for test case
 // 
 
-/// <reference path="typings/jquery/jquery.d.ts"/>
+/// <reference path="../typings/jquery/jquery.d.ts"/>
 var recents = new Recents(JSON.parse(localStorage["rally-ext-recents"])),
 	bookmarks = new Bookmarks(JSON.parse(localStorage["rally-ext-bookmarks"])),
-	recentsToDelete = [];
-
-// var inputFieldElements = {
-// 	saveButton : document.getElementById("save-button"),
-// 	domainValue : document.getElementById("domain"),
-// };
+	recentsToDelete = [],
+	recentsToPin = [];
 
 var addEventListeners = function(){
 	loadRecentsToPage();
 	loadBookmarksToPage();
 	restoreOptions();
-	$(".trash-icon").on("click", function(e){
+	$(".button").button();
+	$(".trash-icon").on("click", function(){
 		if ($(this).hasClass("mark-for-delete")) {
 			$(this).removeClass("mark-for-delete");
 			recentsToDelete.splice(recentsToDelete.indexOf($(this).attr("id")), 1);
@@ -29,7 +26,16 @@ var addEventListeners = function(){
 			recentsToDelete.push($(this).attr("id"));
 		}
 	});
-	$("#save-button").on("click", saveSettings);
+	$(".pin-icon").on("click", function(){
+		if ($(this).hasClass("mark-pinned")) {
+			$(this).removeClass("mark-pinned");
+			recentsToPin.splice(recentsToPin.indexOf($(this).attr("id")), 1);
+		} else {
+			$(this).addClass("mark-pinned");
+			recentsToPin.push($(this).attr("id"));
+		}
+	});
+	$(".save-button").on("click", saveSettings);
 };
 var saveSettings = function(){
 	var domainValue = $("#domain").val(),
@@ -40,6 +46,7 @@ var saveSettings = function(){
 	} else {
 		tempSettings.domain = domainValue;
 	}
+	// change this to pinned items.  Make clicking pinned items change setting, then save button write those settings.
 	for(var i = 0;i<checkedValues.length;i++){
 		if(checkedValues[i].checked == true){
 			tempSettings.selectedArtifacts.push(checkedValues[i].value);
@@ -60,8 +67,8 @@ var restoreOptions = function(){
 var loadRecentsToPage = function(){
 	$("#recents-group").prop("checked", recents.settings.groupTogether);
 	$("#recents-count").prop("value", recents.settings.recentAmount);
-	recents.loadMostRecentsAndAppend("#recents-append");
-	var allRecents = $("#recents-append .truncate");
+	recents.loadMostRecentsAndAppend();
+	var allRecents = $("#recently-visited .truncate");
 	if(allRecents.length>0){
 		$("#clear-all-recents").prop("disabled", false);
 		$("#clear-all-recents").on("click", function(){
@@ -73,9 +80,9 @@ var loadRecentsToPage = function(){
 			trashCanHtml;
 			
 		for(var i=0;i<allRecents.length;i++){
-			pinIconHtml = "<span class='pin-icon'><i id='recents-"+i+"' class='fa fa-thumb-tack'></span></i>" 
-			trashCanHtml = "<span id='delete-"+i+"' class='trash-icon'><i class='fa fa-trash'></span></i>" 
-			$($(allRecents)[i]).prepend(pinIconHtml + trashCanHtml);
+			if(allRecents) 
+			trashCanHtml = "<span id='delete-"+i+"' class='trash-icon'><i class='fa fa-trash'></i></span>" 
+			$($(allRecents)[i]).prepend(trashCanHtml);
 		}	
 	} else {
 		$("#clear-all-recents").prop("disabled", true);

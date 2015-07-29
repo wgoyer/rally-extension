@@ -4,6 +4,7 @@
     <title>Rally</title>
     <link rel="stylesheet" type="text/css" href="../css/styles.css" />
 	<link rel="stylesheet" type="text/css" href="../lib/jquery/jquery-ui.min.css" />
+	<link rel="stylesheet" href="../lib/font-awesome/css/font-awesome.min.css" />
 	<script src="../lib/jquery/jquery-2.1.4.min.js"></script>
 	<script src="../lib/jquery/jquery-ui.min.js"></script>
 	<script src="../js/recents.js"></script>
@@ -14,7 +15,11 @@
   <body class="popup">
 	  <div id="accordion">
 	  	<h3> Recents </h3>
-		<div id="recently-visited"></div>
+		<div id="recently-visited">
+			<div id="pinned-recents">
+				<p class="strong pinned hidden">Pinned</p>
+			</div>
+		</div>
 		<h3> Templates </h3>
 		<div id="templating">
 			<div class="template-header"></div>

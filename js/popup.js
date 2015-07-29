@@ -9,6 +9,7 @@ var startPopup = function(){
 	templates.addListeners();
 	bookmarks.loadBookMarksAndAppend();
 	bookmarks.addListeners();
+	recents.addListeners();
 };
 var createAccordion = function(settings){
 	$("#accordion").accordion({

@@ -1,45 +1,92 @@
 function Recents(settings){
 	this.settings = settings;
 	var me = this;
-	this.loadMostRecentsAndAppend = function(elementId){
-		var appendableElement,
+	this.loadMostRecentsAndAppend = function(){
+		var appendableElement = $("#recently-visited"),
 			groups = [];
-			
-		elementId ? appendableElement = $(elementId) : appendableElement = $("#recently-visited");
-		if(settings.recentlyVisited.length == 0){
+		// Seems like this can probably be cleaned up.	
+		if(me.settings.recentlyVisited.length == 0){
 			appendableElement.append("<p>Items will be displayed here after you start visiting the detail pages of items in your artifacts type list found on the options page of the extension.</p>");
 		} else {
+			// if the user has grouping set up
 			if(me.settings.groupTogether){
 				var currentType,
 					countByGroup = {},
 					groupAppendElement;
+					// iterate through all recents
 				for(var i=0;i<me.settings.recentlyVisited.length;i++){
-					currentType = me.settings.recentlyVisited[i].artifactType;
-					if(groups.indexOf(currentType) == -1) {
-						groups.push(currentType);
-						countByGroup[currentType] = 0;
-						groupAppendElement = appendableElement.append("<div id='"+currentType+"'><p class='strong'>"+currentType+"</p></div>");
-					}
-					if(countByGroup[currentType] < me.settings.recentAmount){
-						countByGroup[currentType]++
-						me.buildHTML(me.settings.recentlyVisited[i], groupAppendElement);	
+					// If the item has been marked as tagged, append to the pinned div.
+					if(me.settings.recentlyVisited[i].pinned) {
+						me.buildHTML(me.settings.recentlyVisited[i], $("#pinned-recents"), true);
+					} else {
+						// otherwise find the group it belongs to, create it if it doesn't exist and append the item to it
+						// but only append up to the amount specified in the settings.
+						currentType = me.settings.recentlyVisited[i].artifactType;
+						if(groups.indexOf(currentType) == -1) {
+							groups.push(currentType);
+							countByGroup[currentType] = 0;
+							appendableElement.append("<div id='"+currentType+"'><p class='strong'>"+currentType+"</p></div>");
+							groupAppendElement = $("[id='"+currentType+"']");
+						}
+						if(countByGroup[currentType] < me.settings.recentAmount){
+							countByGroup[currentType]++
+							me.buildHTML(me.settings.recentlyVisited[i], groupAppendElement);	
+						}
 					}
 				}
 			} else {
 				for(var i = 0;i<me.settings.recentAmount;i++){
-					me.buildHTML(me.settings.recentlyVisited[i], appendableElement);
+					if(me.settings.recentlyVisited[i].pinned) {
+						me.buildHTML(me.settings.recentlyVisited[i], $("#pinned-recents"), true);
+					} else {
+						me.buildHTML(me.settings.recentlyVisited[i], appendableElement);
+					}
 				}
 			}
 		}
 	};
-	this.buildHTML = function(item, appendableElement){
-		var injectableHTML;
-		injectableHTML = "<p class=truncate><a target='_blank' href='"+item.URL+"'>"+item.FormattedID+"</a>: "+item.Title+"</p>";
+	this.buildHTML = function(item, appendableElement, isPinned){
+		var injectableHTML = ""; 
+		if(isPinned){
+			injectableHTML = "<p class=truncate><span artifactType='"+item.artifactType+"' id='pin-"+me.settings.recentlyVisited.indexOf(item)+"' class='pin-icon mark-pinned'><i class='fa fa-thumb-tack'></i></span><a target='_blank' href='"+item.URL+"'>"+item.FormattedID+"</a>: "+item.Title+"</p>";
+		} else {
+			injectableHTML = "<p class=truncate><span artifactType='"+item.artifactType+"' id='pin-"+me.settings.recentlyVisited.indexOf(item)+"' class='pin-icon'><i class='fa fa-thumb-tack'></i></span><a target='_blank' href='"+item.URL+"'>"+item.FormattedID+"</a>: "+item.Title+"</p>" 
+		}	
 		appendableElement.append(injectableHTML);
+	};
+	this.addListeners = function(){
+		// This mess will move pinned icons to a pinned div and remove the div it's in if it was
+		// the only item in there.  Vice versa, it will move pinned items back to the artifact
+		// it was under.  This needs to be modified to create a group div if it doesn't already exist.
+		$(".pin-icon").on("click", function(){
+			if ($(this).hasClass("mark-pinned")) {
+				$(this).removeClass("mark-pinned");
+				me.settings.recentlyVisited[$(this).attr("id").substring(4)].pinned = false;
+				if(me.settings.groupTogether){
+					var artifactDiv = $("[id='"+$(this).attr('artifactType')+"']");
+					artifactDiv.removeClass("hidden");
+					$(this).parent().appendTo(artifactDiv);
+				} else {
+					$(this).parent().appendTo($("#recently-visited"));	
+				}
+				if($("#pinned-recents").children().length<2) $(".strong.pinned").addClass("hidden");
+				// me.writeSettings();
+			} else {
+				$(this).addClass("mark-pinned");
+				me.settings.recentlyVisited[$(this).attr("id").substring(4)].pinned = true;
+				$(this).parent().appendTo($("#pinned-recents"));
+				$(".strong.pinned.hidden").removeClass("hidden");
+				if($("[id='"+$(this).attr('artifactType')+"']").children().length<2) $("[id='"+$(this).attr('artifactType')+"']").addClass("hidden");
+				// me.writeSettings();
+			}
+		});
 	};
 	this.updateSettings = function(){
 		getSettingsFromLocalStorage("rally-ext-recents", function(recents){
 			me.settings = recents;
 		});
+	};
+	this.writeSettings = function(){
+		localStorage["rally-ext-recents"] = JSON.stringify(me.settings);
 	};
 };

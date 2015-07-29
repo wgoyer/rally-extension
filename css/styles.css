@@ -17,9 +17,6 @@ input[type=text] {
 .subtext {
 	font-size: .8em; color: #999; display:block;
 }
-.save-button {
-	margin: 10px 0px 0px 0px
-}
 
 html.popup { 
 	width:400px; 
@@ -33,7 +30,7 @@ body.popup {
 }
 .truncate {
   	white-space: nowrap; 
-    /*width: 31em; */
+    font-size: 11px;
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -95,25 +92,25 @@ p.truncate {
 	height: 15px;
 	width: 15px;
 }
-/*.mark-for-delete{
-	text-decoration: line-through;
-}*/
 .trash-icon {
-	font-size: 16px;
-	text-decoration: none;
+	font-size: 14px;
 	color: darkgrey;
 	padding-right: 5px;
 	border-right: 1px dotted black;
 	margin-right: 5px;
+	cursor: pointer;
 }
 .mark-for-delete {
 	color: red;
 }
 .pin-icon {
-	font-size: 16px;
+	font-size: 14px;
 	color: darkgrey;
 	margin-right: 5px;
+	padding-right: 5px;
+	border-right: 1px dotted black;
+	cursor: pointer;
 }
-.pin-icon-selected {
+.mark-pinned {
 	color: green;
 }
