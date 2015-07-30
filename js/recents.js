@@ -29,15 +29,17 @@ function Recents(settings){
 							groupAppendElement = $("[id='"+currentType+"']");
 						}
 						if(countByGroup[currentType] < me.settings.recentAmount){
+							groupAppendElement = $("[id='"+currentType+"']");
 							countByGroup[currentType]++
 							me.buildHTML(me.settings.recentlyVisited[i], groupAppendElement);	
 						}
 					}
 				}
 			} else {
-				for(var i = 0;i<me.settings.recentAmount;i++){
+				for(var i = 0;i<me.settings.recentAmount && i < me.settings.recentlyVisited.length;i++){
 					if(me.settings.recentlyVisited[i].pinned) {
 						me.buildHTML(me.settings.recentlyVisited[i], $("#pinned-recents"), true);
+						$(".divider").removeClass('hidden');
 					} else {
 						me.buildHTML(me.settings.recentlyVisited[i], appendableElement);
 					}
@@ -48,6 +50,7 @@ function Recents(settings){
 	this.buildHTML = function(item, appendableElement, isPinned){
 		var injectableHTML = ""; 
 		if(isPinned){
+			$(".strong .pinned .hidden").removeClass("hidden");
 			injectableHTML = "<p class=truncate><span artifactType='"+item.artifactType+"' id='pin-"+me.settings.recentlyVisited.indexOf(item)+"' class='pin-icon mark-pinned'><i class='fa fa-thumb-tack'></i></span><a target='_blank' href='"+item.URL+"'>"+item.FormattedID+"</a>: "+item.Title+"</p>";
 		} else {
 			injectableHTML = "<p class=truncate><span artifactType='"+item.artifactType+"' id='pin-"+me.settings.recentlyVisited.indexOf(item)+"' class='pin-icon'><i class='fa fa-thumb-tack'></i></span><a target='_blank' href='"+item.URL+"'>"+item.FormattedID+"</a>: "+item.Title+"</p>" 
@@ -69,15 +72,19 @@ function Recents(settings){
 				} else {
 					$(this).parent().appendTo($("#recently-visited"));	
 				}
-				if($("#pinned-recents").children().length<2) $(".strong.pinned").addClass("hidden");
-				// me.writeSettings();
+				if($("#pinned-recents").children().length<2) {
+					$(".strong.pinned").addClass("hidden");
+					$(".divider").addClass("hidden");
+				}
+				me.writeSettings();
 			} else {
 				$(this).addClass("mark-pinned");
 				me.settings.recentlyVisited[$(this).attr("id").substring(4)].pinned = true;
 				$(this).parent().appendTo($("#pinned-recents"));
 				$(".strong.pinned.hidden").removeClass("hidden");
+				$(".divider").removeClass("hidden");
 				if($("[id='"+$(this).attr('artifactType')+"']").children().length<2) $("[id='"+$(this).attr('artifactType')+"']").addClass("hidden");
-				// me.writeSettings();
+				me.writeSettings();
 			}
 		});
 	};

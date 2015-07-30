@@ -17,6 +17,7 @@ var addEventListeners = function(){
 	loadBookmarksToPage();
 	restoreOptions();
 	$(".button").button();
+	recents.addListeners();
 	$(".trash-icon").on("click", function(){
 		if ($(this).hasClass("mark-for-delete")) {
 			$(this).removeClass("mark-for-delete");
@@ -26,32 +27,34 @@ var addEventListeners = function(){
 			recentsToDelete.push($(this).attr("id"));
 		}
 	});
-	$(".pin-icon").on("click", function(){
-		if ($(this).hasClass("mark-pinned")) {
-			$(this).removeClass("mark-pinned");
-			recentsToPin.splice(recentsToPin.indexOf($(this).attr("id")), 1);
-		} else {
-			$(this).addClass("mark-pinned");
-			recentsToPin.push($(this).attr("id"));
-		}
-	});
+	// $(".pin-icon").on("click", function(){
+	// 	if ($(this).hasClass("mark-pinned")) {
+	// 		$(this).removeClass("mark-pinned");
+	// 		recentsToPin.splice(recentsToPin.indexOf($(this).attr("id")), 1);
+	// 	} else {
+	// 		$(this).addClass("mark-pinned");
+	// 		recentsToPin.push($(this).attr("id"));
+	// 	}
+	// });
 	$(".save-button").on("click", saveSettings);
 };
 var saveSettings = function(){
 	var domainValue = $("#domain").val(),
-		checkedValues = document.querySelectorAll("input[type=checkbox]"),
+		checkedValues = $(".settings-container input[type=checkbox]"),
 		tempSettings = {"selectedArtifacts" : []};
 	if(domainValue == "") {
 		tempSettings.domain = "rally1.rallydev.com";
 	} else {
 		tempSettings.domain = domainValue;
 	}
-	// change this to pinned items.  Make clicking pinned items change setting, then save button write those settings.
 	for(var i = 0;i<checkedValues.length;i++){
 		if(checkedValues[i].checked == true){
 			tempSettings.selectedArtifacts.push(checkedValues[i].value);
 		}
 	}
+	recents.settings.groupTogether = $("#recents-group").is(":checked");
+	recents.settings.recentAmount = $("#recents-count").val();
+	recents.writeSettings();
 	localStorage["rally-ext"] = JSON.stringify(tempSettings);
 };
 var restoreOptions = function(){
@@ -68,7 +71,7 @@ var loadRecentsToPage = function(){
 	$("#recents-group").prop("checked", recents.settings.groupTogether);
 	$("#recents-count").prop("value", recents.settings.recentAmount);
 	recents.loadMostRecentsAndAppend();
-	var allRecents = $("#recently-visited .truncate");
+	var allRecents = $("#all-recents .truncate");
 	if(allRecents.length>0){
 		$("#clear-all-recents").prop("disabled", false);
 		$("#clear-all-recents").on("click", function(){
@@ -76,9 +79,7 @@ var loadRecentsToPage = function(){
 			$("#span-clear-all-recents").html("<p>All recents are marked for removal.  Press the Save button to apply</p>")
 			$(".trash-icon").addClass("mark-for-delete");
 		});
-		var pinIconHtml,
-			trashCanHtml;
-			
+		var trashCanHtml;
 		for(var i=0;i<allRecents.length;i++){
 			if(allRecents) 
 			trashCanHtml = "<span id='delete-"+i+"' class='trash-icon'><i class='fa fa-trash'></i></span>" 

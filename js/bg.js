@@ -14,12 +14,14 @@
 // Add checkboxes to recents to allow users to keep them on top.
 
 
-var settings;
+var settings,
+	recents; 
 
 var initSettings = function(callback) {
 	if(!localStorage["rally-ext"]) localStorage["rally-ext"] = '{"domain" : "rally1.rallydev.com", "selectedArtifacts" : []}';
-	if(!localStorage["rally-ext-recents"]) localStorage["rally-ext-recents"] = '{"recentlyVisited" : [], groupTogether : false, recentAmount : 15}';
+	if(!localStorage["rally-ext-recents"]) localStorage["rally-ext-recents"] = '{"recentlyVisited" : [], "groupTogether" : false, "recentAmount" : 15}';
 	if(!localStorage["rally-ext-templates"]) localStorage["rally-ext-templates"] = '{"active" : "", "templates" : []}';
+	recents = new Recents(JSON.parse(localStorage["rally-ext-recents"]));
 	artifactInfo.getWatchArtifacts();
 	settings = JSON.parse(localStorage["rally-ext"]);
 	callback();
@@ -94,8 +96,8 @@ var createRegXs = function(callback){
 	return callback(allMyRegXsLiveInTexas);
 };
 var pullArtifactInfoAndStoreToRecents = function(artifact, artifactName, url){
-	var recentStorage = JSON.parse(localStorage['rally-ext-recents']),
-		recents = {recentlyVisited : recentStorage.recentlyVisited || []},
+	// var recentStorage = JSON.parse(localStorage['rally-ext-recents']),
+		var settings = recents.settings,
 		currentItem = {};		
 	if(artifact.FormattedID) {
 		currentItem = {"FormattedID" : artifact.FormattedID, "Title" : artifact._refObjectName, "URL" : url, artifactType : artifactName};	
@@ -106,15 +108,15 @@ var pullArtifactInfoAndStoreToRecents = function(artifact, artifactName, url){
 	if(artifact.ReleaseStartDate){
 		currentItem = {"FormattedID" : "Release", "Title" : artifact.Name, "URL" : url, artifactType : artifactName};
 	}		
-	if(recentStorage.recentlyVisited.length>0){
-		for(var i=0;i<recentStorage.recentlyVisited.length;i++){
-			if(recentStorage.recentlyVisited[i].FormattedID === currentItem.FormattedID){
-				recents.recentlyVisited.splice(i, 1);	
+	if(settings.recentlyVisited.length>0){
+		for(var i=0;i<settings.recentlyVisited.length;i++){
+			if(settings.recentlyVisited[i].FormattedID === currentItem.FormattedID){
+				settings.recentlyVisited.splice(i, 1);	
 			}
 		}
 	} 
-	recents.recentlyVisited.unshift(currentItem);
-	return localStorage['rally-ext-recents'] = JSON.stringify(recents);	
+	settings.recentlyVisited.unshift(currentItem);
+	recents.writeSettings();
 };
 
 initSettings(startExtension);
