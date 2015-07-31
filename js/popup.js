@@ -23,10 +23,6 @@ var createAccordion = function(settings){
 		}
 	});
 };
-var getSettingsFromLocalStorage = function(settingType, callback){
-	var settings = JSON.parse(localStorage[settingType]);
-	callback(settings);	
-};
 var saveValuesToLocalStorage = function(settingType, values, callback){
 	localStorage[settingType] = JSON.stringify(values);
 	if (callback) return callback();

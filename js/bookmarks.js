@@ -15,9 +15,7 @@ function Bookmarks(settings){
 		}
 	};
 	this.updateSettings = function(){
-		getSettingsFromLocalStorage("rally-ext-bookmarks", function(bookmarks){
-			me.settings = bookmarks;	
-		});
+		me.settings = JSON.parse(localStorage["rally-ext-bookmarks"]);
 	};
 	this.addListeners = function(){
 		// When user clicks save bookmark, save current-tab URL to local storage.

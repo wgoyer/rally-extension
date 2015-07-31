@@ -17,6 +17,7 @@ function Recents(settings){
 				for(var i=0;i<me.settings.recentlyVisited.length;i++){
 					// If the item has been marked as tagged, append to the pinned div.
 					if(me.settings.recentlyVisited[i].pinned) {
+						$(".strong.pinned.hidden").removeClass("hidden");
 						me.buildHTML(me.settings.recentlyVisited[i], $("#pinned-recents"), true);
 					} else {
 						// otherwise find the group it belongs to, create it if it doesn't exist and append the item to it
@@ -50,7 +51,7 @@ function Recents(settings){
 	this.buildHTML = function(item, appendableElement, isPinned){
 		var injectableHTML = ""; 
 		if(isPinned){
-			$(".strong .pinned .hidden").removeClass("hidden");
+			$(".strong.pinned.hidden").removeClass("hidden");
 			injectableHTML = "<p class=truncate><span artifactType='"+item.artifactType+"' id='pin-"+me.settings.recentlyVisited.indexOf(item)+"' class='pin-icon mark-pinned'><i class='fa fa-thumb-tack'></i></span><a target='_blank' href='"+item.URL+"'>"+item.FormattedID+"</a>: "+item.Title+"</p>";
 		} else {
 			injectableHTML = "<p class=truncate><span artifactType='"+item.artifactType+"' id='pin-"+me.settings.recentlyVisited.indexOf(item)+"' class='pin-icon'><i class='fa fa-thumb-tack'></i></span><a target='_blank' href='"+item.URL+"'>"+item.FormattedID+"</a>: "+item.Title+"</p>" 
@@ -66,7 +67,13 @@ function Recents(settings){
 				$(this).removeClass("mark-pinned");
 				me.settings.recentlyVisited[$(this).attr("id").substring(4)].pinned = false;
 				if(me.settings.groupTogether){
-					var artifactDiv = $("[id='"+$(this).attr('artifactType')+"']");
+					var artifactType = $(this).attr('artifactType'),
+						artifactDiv;
+					artifactDiv = $("[id='"+artifactType+"']");
+					if(artifactDiv.length==0){
+						$("#recently-visited").append("<div id='"+artifactType+"'><p class='strong'>"+artifactType+"</p></div>");
+						artifactDiv = $("[id='"+artifactType+"']");
+					}
 					artifactDiv.removeClass("hidden");
 					$(this).parent().appendTo(artifactDiv);
 				} else {
@@ -81,17 +88,15 @@ function Recents(settings){
 				$(this).addClass("mark-pinned");
 				me.settings.recentlyVisited[$(this).attr("id").substring(4)].pinned = true;
 				$(this).parent().appendTo($("#pinned-recents"));
+				if(!me.settings.groupTogether) $(".divider").removeClass("hidden");
 				$(".strong.pinned.hidden").removeClass("hidden");
-				$(".divider").removeClass("hidden");
 				if($("[id='"+$(this).attr('artifactType')+"']").children().length<2) $("[id='"+$(this).attr('artifactType')+"']").addClass("hidden");
 				me.writeSettings();
 			}
 		});
 	};
 	this.updateSettings = function(){
-		getSettingsFromLocalStorage("rally-ext-recents", function(recents){
-			me.settings = recents;
-		});
+		me.settings = JSON.parse(localStorage["rally-ext-recents"]);
 	};
 	this.writeSettings = function(){
 		localStorage["rally-ext-recents"] = JSON.stringify(me.settings);

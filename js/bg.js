@@ -97,8 +97,9 @@ var createRegXs = function(callback){
 };
 var pullArtifactInfoAndStoreToRecents = function(artifact, artifactName, url){
 	// var recentStorage = JSON.parse(localStorage['rally-ext-recents']),
+		recents.updateSettings();
 		var settings = recents.settings,
-		currentItem = {};		
+		currentItem = {};
 	if(artifact.FormattedID) {
 		currentItem = {"FormattedID" : artifact.FormattedID, "Title" : artifact._refObjectName, "URL" : url, artifactType : artifactName};	
 	} 

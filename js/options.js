@@ -13,6 +13,7 @@ var recents = new Recents(JSON.parse(localStorage["rally-ext-recents"])),
 	recentsToPin = [];
 
 var addEventListeners = function(){
+	recents.updateSettings();
 	loadRecentsToPage();
 	loadBookmarksToPage();
 	restoreOptions();

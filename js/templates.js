@@ -47,9 +47,7 @@ function Templates(settings){
 	}
 	// Gets settings from local storage.
 	this.updateSettings = function(){
-		getSettingsFromLocalStorage("rally-ext-templates", function(templates){
-			me.settings = templates;
-		});
+		me.settings = JSON.parse(localStorage["rally-ext-templates"]);
 	}
 	this.filterTemplatesOnTag = function(tag){
 		$("#template-append").html("<button>Clear Filter</button>");
