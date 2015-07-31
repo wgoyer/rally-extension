@@ -36,6 +36,7 @@ function Bookmarks(settings){
 					saveValuesToLocalStorage("rally-ext-bookmarks", me.settings);	
 				} else {
 					me.settings.push({"title": tab.title, "url": tab.url, "favicon": tab.favIconUrl});
+					saveValuesToLocalStorage("rally-ext-bookmarks", me.settings);
 				}
 				$("#bookmark-append").empty();
 				me.loadBookMarksAndAppend();
